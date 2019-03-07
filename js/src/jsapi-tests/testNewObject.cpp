@@ -63,7 +63,8 @@ BEGIN_TEST(testNewObject_1) {
   bool isArray;
 
   // With no arguments.
-  JS::RootedObject obj(cx, JS_New(cx, Array, JS::HandleValueArray::empty()));
+  JS::RootedObject obj(cx);
+  JS::Construct(cx, v, JS::HandleValueArray::empty(), &obj);
   CHECK(obj);
   JS::RootedValue rt(cx, JS::ObjectValue(*obj));
   CHECK(JS_IsArrayObject(cx, obj, &isArray));
@@ -74,7 +75,7 @@ BEGIN_TEST(testNewObject_1) {
 
   // With one argument.
   argv[0].setInt32(4);
-  obj = JS_New(cx, Array, JS::HandleValueArray::subarray(argv, 0, 1));
+  JS::Construct(cx, v, JS::HandleValueArray::subarray(argv, 0, 1), &obj);
   CHECK(obj);
   rt = JS::ObjectValue(*obj);
   CHECK(JS_IsArrayObject(cx, obj, &isArray));
@@ -86,7 +87,7 @@ BEGIN_TEST(testNewObject_1) {
   for (size_t i = 0; i < N; i++) {
     argv[i].setInt32(i);
   }
-  obj = JS_New(cx, Array, JS::HandleValueArray::subarray(argv, 0, N));
+  JS::Construct(cx, v, JS::HandleValueArray::subarray(argv, 0, N), &obj);
   CHECK(obj);
   rt = JS::ObjectValue(*obj);
   CHECK(JS_IsArrayObject(cx, obj, &isArray));
@@ -104,7 +105,7 @@ BEGIN_TEST(testNewObject_1) {
   JS::RootedObject ctor(cx, JS_NewObject(cx, &cls));
   CHECK(ctor);
   JS::RootedValue rt2(cx, JS::ObjectValue(*ctor));
-  obj = JS_New(cx, ctor, JS::HandleValueArray::subarray(argv, 0, 3));
+  JS::Construct(cx, rt2, JS::HandleValueArray::subarray(argv, 0, 3), &obj);
   CHECK(obj);
   CHECK(JS_GetElement(cx, ctor, 0, &v));
   CHECK(v.isInt32(0));
@@ -122,7 +123,8 @@ BEGIN_TEST(testNewObject_IsMapObject) {
 
   bool isMap = false;
   bool isSet = false;
-  JS::RootedObject mapObj(cx, JS_New(cx, Map, JS::HandleValueArray::empty()));
+  JS::RootedObject mapObj(cx);
+  JS::Construct(cx, vMap, JS::HandleValueArray::empty(), &mapObj);
   CHECK(mapObj);
   CHECK(JS::IsMapObject(cx, mapObj, &isMap));
   CHECK(isMap);
@@ -133,7 +135,8 @@ BEGIN_TEST(testNewObject_IsMapObject) {
   EVAL("Set", &vSet);
   JS::RootedObject Set(cx, vSet.toObjectOrNull());
 
-  JS::RootedObject setObj(cx, JS_New(cx, Set, JS::HandleValueArray::empty()));
+  JS::RootedObject setObj(cx);
+  JS::Construct(cx, vSet, JS::HandleValueArray::empty(), &setObj);
   CHECK(setObj);
   CHECK(JS::IsMapObject(cx, setObj, &isMap));
   CHECK(!isMap);
